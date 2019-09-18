@@ -11,23 +11,21 @@ from plot_workspace_area import plot_workspace
 
 
 d = 6
-L1 = 3#Нижний диапазон
-L2 = 15#верхний диапазон
-N = 50#частота разбиения равномерной сетки
-# Размер квадратной сетки
-l1 = -L2
-l2 = L2
-#задаём сетку
+L1 = 3  # Lower range of row
+L2 = 15  # Upper range of row
+N = 50  # The number of nodes on uniform grid
+l1 = -L2  # Left and lower border of uniform grid
+l2 = L2  # Right and upper border of uniform grid
 X1 = np.linspace(l1, l2, N)
 Y1 = np.linspace(l1, l2, N)
-X, Y = np.meshgrid(X1, Y1)
-e = 10
-"""### Стандартный алгоритм"""
+X, Y = np.meshgrid(X1, Y1)  # Build X and Y of uniform grid
+e = 10  # Max number of iterations
 
-X_area, Y_area, X_border, Y_border = check_box(X, Y, N, L1, L2, d, e)
-plot_workspace(L1, L2, d, X_area, Y_area, X_border, Y_border)
+X_area, Y_area, X_border, Y_border = check_box(X, Y, N, L1, L2, d, e) # Calculate workspace area and border coordinates
+plot_workspace(L1, L2, d, X_area, Y_area, X_border, Y_border)  # Plotting
 
-"""### Алгоритм с усилением"""
+"""
+### Алгоритм с усилением
 
 area_points_X_l = []
 area_points_X_r = []
@@ -58,7 +56,7 @@ for i in range(N-1):
           border_points_Y_r.append(Y[i+1, j])
 draw_and_compute(L1, L1, L2, L2, d, l1, l2)
 
-"""### Алгоритм с рекурсивным делением области равномерной сетки"""
+### Алгоритм с рекурсивным делением области равномерной сетки
 
 area_points_X_l = []
 area_points_X_r = []
@@ -78,3 +76,4 @@ L2y = L2
 stop = (l2 - l1)/N# фиксируем длину сторону квадрата u как флаг для остановки
 check_Box_branch_and_bounce(L1x, L2x, L1y, L2y)
 draw_and_compute(L1, L1, L2, L2, d, l1, l2)
+"""

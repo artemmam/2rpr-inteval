@@ -54,7 +54,7 @@ def check_box(x, y, n, l1, l2, d, e = 10):
                 except:
                     break                 # if there is no intersection at all, than it's outside of the workspace
     return [area_points_x_l, area_points_x_r], [area_points_y_l, area_points_y_r], [border_points_x_l, border_points_x_r], [border_points_y_l, border_points_y_r]
-
+"""
 def check_Box_no_Kr(u1, u2):# алгоритм с усиленной проверкой по 4 стороным
   check = True
   V1_bor = [ival.Interval([L1, L2]), ival.Interval([L2, L2]), ival.Interval([L1, L2]), ival.Interval([L1, L1])]
@@ -130,3 +130,4 @@ def check_Box_custom_v(u1, u2, v1, v2):# базовый алгоритм для 
     except:
       return 2
       break
+"""
