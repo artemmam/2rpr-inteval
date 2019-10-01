@@ -2,9 +2,9 @@ import shapely.geometry as sg
 import matplotlib.pyplot as plt
 import descartes
 from matplotlib.patches import Circle, Rectangle
+from box_class import BoxPoints
 
-
-def plot_workspace(l1, l2, d, points_area_x, points_area_y, points_border_x, points_border_y):
+def plot_workspace(l1, l2, d, area_points, border_points):
     """
     Function for plotting workspace area of 2-RPR robot with approximation on uniform grid
     :param l1: the lowest range of 2-RPR rod
@@ -45,16 +45,16 @@ def plot_workspace(l1, l2, d, points_area_x, points_area_y, points_border_x, poi
         ax.add_patch(circle4)
         ax.add_patch(rect1)
         ax.axes.set_aspect('equal')
-        for i in range(len(points_area_x[0])):  # Plot rectangles, which compose workspace area
-            rect1 = Rectangle([points_area_x[0][i], points_area_y[0][i]],
-                              points_area_x[1][i] - points_area_x[0][i],
-                              points_area_y[1][i] - points_area_y[0][i],
+        for i in range(len(area_points.get_points('xleft'))):  # Plot rectangles, which compose workspace area
+            rect1 = Rectangle([area_points.get_points('xleft')[i], area_points.get_points('yleft')[i]],
+                              area_points.get_points('xright')[i] - area_points.get_points('xleft')[i],
+                              area_points.get_points('yright')[i] - area_points.get_points('yleft')[i],
                               fill=True, fc='red', color='g', linewidth=1.0, alpha=0.5)
             ax.add_patch(rect1)
-        for i in range(len(points_border_x[0])):  # Plot rectangles, which compose the border of workspace area
-            rect2 = Rectangle([points_border_x[0][i], points_border_y[0][i]],
-                              points_border_x[1][i] - points_border_x[0][i],
-                              points_border_x[1][i] - points_border_x[0][i],
+        for i in range(len(border_points.get_points('xleft'))):  # Plot rectangles, which compose the border of workspace area
+            rect2 = Rectangle([border_points.get_points('xleft')[i], border_points.get_points('yleft')[i]],
+                              border_points.get_points('xright')[i] - border_points.get_points('xleft')[i],
+                              border_points.get_points('yright')[i] - border_points.get_points('yleft')[i],
                               fill=True, fc='black', color='yellow', linewidth=1.0, alpha=0.5)
             ax.add_patch(rect2)
         plt.show()

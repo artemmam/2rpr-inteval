@@ -3,12 +3,7 @@ from mpmath import iv
 import interval as ival
 from check_box import check_box
 from plot_workspace_area import plot_workspace
-
-
-
-
-
-
+from box_class import BoxPoints
 
 d = 6
 L1 = 3  # Lower range of row
@@ -20,9 +15,10 @@ X1 = np.linspace(l1, l2, N)
 Y1 = np.linspace(l1, l2, N)
 X, Y = np.meshgrid(X1, Y1)  # Build X and Y of uniform grid
 e = 10  # Max number of iterations
-
-X_area, Y_area, X_border, Y_border = check_box(X, Y, N, L1, L2, d, e) # Calculate workspace area and border coordinates
-plot_workspace(L1, L2, d, X_area, Y_area, X_border, Y_border)  # Plotting
+area_points = BoxPoints()
+border_points = BoxPoints()
+area_points, border_points = check_box(X, Y, N, L1, L2, d, e) # Calculate workspace area and border coordinates
+plot_workspace(L1, L2, d, area_points, border_points)  # Plotting
 
 """
 ### Алгоритм с усилением
