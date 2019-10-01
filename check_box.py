@@ -1,11 +1,10 @@
 import interval as ival
 from kravchik_operator import get_krav_func
+from box_class import BoxPoints
 
 
 krav_transform = get_krav_func()
 #  TODO: add more description for function check_box
-
-
 def check_box(x, y, n, l1, l2, d, e = 10):
     """
     Function for checking intervals rectangles on uniform grid to compare with
@@ -19,14 +18,16 @@ def check_box(x, y, n, l1, l2, d, e = 10):
     :return: 4 arrays of calculated rectangles: X-coordinates of workspace area, Y-coordinates of workspace area,
              X-coordinates of border of workspace area, Y-coordinates of border of workspace area
     """
-    area_points_x_l = []  # Lists of left and right borders of area rectangles for X and Y coordinates
-    area_points_x_r = []
-    area_points_y_l = []
-    area_points_y_r = []
-    border_points_x_l = []  # Lists of left and right borders of border rectangles for X and Y coordinates
-    border_points_x_r = []
-    border_points_y_l = []
-    border_points_y_r = []
+    #area_points_x_l = []  # Lists of left and right borders of area rectangles for X and Y coordinates
+    #area_points_x_r = []
+    #area_points_y_l = []
+    #area_points_y_r = []
+    #border_points_x_l = []  # Lists of left and right borders of border rectangles for X and Y coordinates
+    #border_points_x_r = []
+    #border_points_y_l = []
+    #border_points_y_r = []
+    area_points = BoxPoints()
+    border_points = BoxPoints()
     for i in range(n - 1):
         for j in range(n - 1):
             u1 = ival.Interval([x[i, j], x[i, j + 1]])  # Interval form of X-coordinate of rectangle of uniform grid
@@ -38,22 +39,24 @@ def check_box(x, y, n, l1, l2, d, e = 10):
                 v2mid = v2.mid()
                 v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d)  # Calculate Kravchik evaluation for u1, u2
                 if (v_krav[0][0].isIn(v1)) and (v_krav[1][0].isIn(v2)):  # Compare Kravchik evaluation with v
-                    area_points_x_l.append(x[i, j])                 # if it is inside previous interval, than it's
-                    area_points_x_r.append(x[i, j + 1])             # inside the workspace area
-                    area_points_y_l.append(y[i, j])
-                    area_points_y_r.append(y[i + 1, j])
+                    area_points.add_point(x[i, j], 'xleft')                 # if it is inside previous interval, then it's
+                    area_points.add_point(x[i, j + 1], 'xright')             # inside the workspace area
+                    area_points.add_point(y[i, j], 'yleft')
+                    area_points.add_point(y[i + 1, j], 'yright')
                     break
                 if k == e - 1:
-                    border_points_x_l.append(x[i, j])       # If we achieve max of the iterations, than it's border
-                    border_points_x_r.append(x[i, j + 1])
-                    border_points_y_l.append(y[i, j])
-                    border_points_y_r.append(y[i + 1, j])
+                    border_points.add_point(x[i, j], 'xleft')       # If we achieve max of the iterations, then it's border
+                    border_points.add_point(x[i, j + 1], 'xright')
+                    border_points.add_point(y[i, j], 'yleft')
+                    border_points.add_point(y[i + 1, j], 'yright')
                 try:
-                    v1.intersec(v_krav[0][0])  # If our evalution not fully inside, than intersect it and repeat
+                    v1.intersec(v_krav[0][0])  # If our evalution not fully inside, then intersect it and repeat
                     v2.intersec(v_krav[1][0])
                 except:
-                    break                 # if there is no intersection at all, than it's outside of the workspace
-    return [area_points_x_l, area_points_x_r], [area_points_y_l, area_points_y_r], [border_points_x_l, border_points_x_r], [border_points_y_l, border_points_y_r]
+                    break                 # if there is no intersection at all, then it's outside of the workspace
+   # print(area_points.a)
+   # print(border_points.a)
+    return area_points, border_points
 """
 def check_Box_no_Kr(u1, u2):# алгоритм с усиленной проверкой по 4 стороным
   check = True
