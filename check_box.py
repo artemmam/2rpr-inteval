@@ -9,7 +9,7 @@ krav_transform = get_krav_func()
 
 def check_box(x, y, n, l1, l2, d, p = 10):
     """
-    Function for checking intervals rectangles on uniform grid to compare with
+    Function for checking intervals rectangles on uniform grid to approximate workspace area of 2-RPR robot
     :param x: X-coordinates of elements of uniform grid
     :param y: Y-coordinates of elements of uniform grid
     :param n: number of nodes of uniform grid
@@ -27,7 +27,7 @@ def check_box(x, y, n, l1, l2, d, p = 10):
             u1 = ival.Interval([x[i, j], x[i, j + 1]])  # Interval form of X-coordinate of rectangle of uniform grid
             u2 = ival.Interval([y[i, j], y[i + 1, j]])  # Interval form of Y-coordinate of rectangle of uniform grid
             if classical_krav_eval(u1, u2, n, l1, l2, d, p) == 'inside' or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'inside':
-                area_points.add_point(u1[0], 'xleft')              # if it is inside previous interval, then it's
+                area_points.add_point(u1[0], 'xleft')
                 area_points.add_point(u1[1], 'xright')         # inside the workspace area
                 area_points.add_point(u2[0], 'yleft')
                 area_points.add_point(u2[1], 'yright')
@@ -58,13 +58,13 @@ def classical_krav_eval(u1, u2, l1, l2, d, p=10):
         v2mid = v2.mid()
         v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d)  # Calculate Kravchik evaluation for u1, u2
         if (v_krav[0][0].isIn(v1)) and (v_krav[1][0].isIn(v2)):  # Compare Kravchik evaluation with v
-            return 'inside'
+            return 'inside'  # if it is inside previous interval, then it's inside the workspace area
         if k == p - 1:
-            return 'border'
+            return 'border'  # if we achieve max of the iterations, then it's border
         try:
-            v1.intersec(v_krav[0][0])  # If our evalution not fully inside, then intersect it and repeat
+            v1.intersec(v_krav[0][0])  # if our evalution not fully inside, then intersect it and repeat
             v2.intersec(v_krav[1][0])
-        except:
+        except:                        # if there is no intersection, then the cell is outside
             return 'outside'
 
 
@@ -81,11 +81,10 @@ def boundary_krav_eval(u1, u2, l1, l2, d, p=10):  # алгоритм с усил
     :return: the string 'inside', 'outside' or 'border'
     """
     check = True
+    # 4 bounds of the checking box v
     v1_border = [ival.Interval([l1, l2]), ival.Interval([l2, l2]), ival.Interval([l1, l2]), ival.Interval([l1, l1])]
     v2_border = [ival.Interval([l1, l1]), ival.Interval([l1, l2]), ival.Interval([l2, l2]), ival.Interval([l1, l2])]
-    area_points = BoxPoints()
-    border_points = BoxPoints()
-    for s in range(4):
+    for s in range(4):  # Check all 4 boxes
         v1 = v1_border[s]
         v2 = v2_border[s]
         for k in range(p):
@@ -93,22 +92,22 @@ def boundary_krav_eval(u1, u2, l1, l2, d, p=10):  # алгоритм с усил
             v2mid = v2.mid()
             v1_bor = ival.Interval([l1, l2])
             v2_bor = ival.Interval([l1, l2])
-            v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d)
-            if (v_krav[0][0].isIn(v1_bor)) and (v_krav[1][0].isIn(v2_bor)):
+            v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d) # Calculate Kravchik evaluation for u1, u2
+            if (v_krav[0][0].isIn(v1_bor)) and (v_krav[1][0].isIn(v2_bor)): # Compare Kravchik evaluation with v
                 check = True
-                if p == 3 and check:
+                if p == 3 and check:  # if it is inside all 4 boundaries, then it's inside the workspace area
                     return 'inside'
             else:
                 check = False
             if k == p - 1:
-                return 'border'
+                return 'border'  # if we achieve max of the iterations, then it's border
             try:
-                v1_bor.intersec(A[0][0])
+                v1_bor.intersec(A[0][0])  # if our evalution not fully inside, then intersect it and repeat
                 v2_bor.intersec(A[1][0])
                 v1 = v1_bor
                 v2 = v2_bor
             except:
-                return 'outside'
+                return 'outside'  # if there is no intersection, then the cell is outside
 """
 def check_Box_branch_and_bounce(L1x, L2x, L1y, L2y):# алгоритм рекурсивного деления исходной области на более мелкие области
   Lx = L2x - L1x
