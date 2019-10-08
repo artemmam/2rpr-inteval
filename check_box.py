@@ -1,13 +1,10 @@
 import interval as ival
 from kravchik_operator import get_krav_func
 from box_class import BoxPoints
-
-
-krav_transform = get_krav_func()
 #  TODO: add more description for function check_box
 
 
-def check_box(x, y, n, l1, l2, d, p = 10):
+def check_box(x, y, n, l1, l2, d, checker, p=10):
     """
     Function for checking intervals rectangles on uniform grid to approximate workspace area of 2-RPR robot
     :param x: X-coordinates of elements of uniform grid
@@ -26,20 +23,22 @@ def check_box(x, y, n, l1, l2, d, p = 10):
         for j in range(n - 1):
             u1 = ival.Interval([x[i, j], x[i, j + 1]])  # Interval form of X-coordinate of rectangle of uniform grid
             u2 = ival.Interval([y[i, j], y[i + 1, j]])  # Interval form of Y-coordinate of rectangle of uniform grid
-            if classical_krav_eval(u1, u2, n, l1, l2, d, p) == 'inside' or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'inside':
+            if checker(u1, u2, l1, l2, d, p) == 'inside': #or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'inside':
                 area_points.add_point(u1[0], 'xleft')
                 area_points.add_point(u1[1], 'xright')         # inside the workspace area
                 area_points.add_point(u2[0], 'yleft')
                 area_points.add_point(u2[1], 'yright')
-            elif classical_krav_eval(u1, u2, n, l1, l2, d, p) == 'border' or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'border':
+            elif checker(u1, u2, l1, l2, d, p) == 'border': #or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'border':
                 border_points.add_point(u1[0], 'xleft')  # if it is inside previous interval, then it's
                 border_points.add_point(u1[1], 'xright')  # inside the workspace area
                 border_points.add_point(u2[0], 'yleft')
                 border_points.add_point(u2[1], 'yright')
     return area_points, border_points
 
+
+"""
 def classical_krav_eval(u1, u2, l1, l2, d, p=10):
-    """
+    
     Check the cell u with classical Krawczyk operator if it is inside of the workspace area,
     outside or on the border
     :param u1: the X coordinates of cell u
@@ -50,7 +49,7 @@ def classical_krav_eval(u1, u2, l1, l2, d, p=10):
     :param d: the distance between rods
     :param p: the max number of iterations
     :return: the string 'inside', 'outside' or 'border'
-    """
+   
     v1 = ival.Interval([l1, l2])  # Interval form of X-coordinate for box v
     v2 = ival.Interval([l1, l2])  # Interval form of Y-coordinate for box v
     for k in range(p):
@@ -69,7 +68,6 @@ def classical_krav_eval(u1, u2, l1, l2, d, p=10):
 
 
 def boundary_krav_eval(u1, u2, l1, l2, d, p=10):  # алгоритм с усиленной проверкой по 4 стороным
-    """
     Check the cell u with boundary Krawczyk operator if it is inside of the workspace area,
     outside or on the border
     :param u1: the X coordinates of cell u
@@ -79,7 +77,6 @@ def boundary_krav_eval(u1, u2, l1, l2, d, p=10):  # алгоритм с усил
     :param d: the distance between rods
     :param p: the max number of iterations
     :return: the string 'inside', 'outside' or 'border'
-    """
     check = True
     # 4 bounds of the checking box v
     v1_border = [ival.Interval([l1, l2]), ival.Interval([l2, l2]), ival.Interval([l1, l2]), ival.Interval([l1, l1])]
@@ -108,7 +105,7 @@ def boundary_krav_eval(u1, u2, l1, l2, d, p=10):  # алгоритм с усил
                 v2 = v2_bor
             except:
                 return 'outside'  # if there is no intersection, then the cell is outside
-"""
+
 def check_Box_branch_and_bounce(L1x, L2x, L1y, L2y):# алгоритм рекурсивного деления исходной области на более мелкие области
   Lx = L2x - L1x
   Ly = L2y - L1y
