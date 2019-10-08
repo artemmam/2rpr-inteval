@@ -5,7 +5,7 @@ from box_class import BoxPoints
 
 krav_transform = get_krav_func()
 #  TODO: add more description for function check_box
-def check_box(x, y, n, l1, l2, d, e = 10):
+def check_box(x, y, n, l1, l2, d, p = 10):
     """
     Function for checking intervals rectangles on uniform grid to compare with
     :param x: X-coordinates of elements of uniform grid
@@ -14,38 +14,65 @@ def check_box(x, y, n, l1, l2, d, e = 10):
     :param l1: the lowest range of 2-RPR rod
     :param l2: the highest range of 2-RPR rod
     :param d: the distance between rods
-    :param e: the max number of iterations
+    :param p: the max number of iterations
     :return: 4 arrays of calculated rectangles: X-coordinates of workspace area, Y-coordinates of workspace area,
              X-coordinates of border of workspace area, Y-coordinates of border of workspace area
     """
-    #area_points_x_l = []  # Lists of left and right borders of area rectangles for X and Y coordinates
-    #area_points_x_r = []
-    #area_points_y_l = []
-    #area_points_y_r = []
-    #border_points_x_l = []  # Lists of left and right borders of border rectangles for X and Y coordinates
-    #border_points_x_r = []
-    #border_points_y_l = []
-    #border_points_y_r = []
     area_points = BoxPoints()
     border_points = BoxPoints()
+    v1 = ival.Interval([l1, l2])  # Interval form of X-coordinate for box v
+    v2 = ival.Interval([l1, l2])  # Interval form of Y-coordinate for box v
     for i in range(n - 1):
         for j in range(n - 1):
             u1 = ival.Interval([x[i, j], x[i, j + 1]])  # Interval form of X-coordinate of rectangle of uniform grid
             u2 = ival.Interval([y[i, j], y[i + 1, j]])  # Interval form of Y-coordinate of rectangle of uniform grid
-            v1 = ival.Interval([l1, l2])  # Interval form of X-coordinate for box v
-            v2 = ival.Interval([l1, l2])  # Interval form of Y-coordinate for box v
-            for k in range(e):
+            for k in range(p):
                 v1mid = v1.mid()
                 v2mid = v2.mid()
                 v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d)  # Calculate Kravchik evaluation for u1, u2
                 if (v_krav[0][0].isIn(v1)) and (v_krav[1][0].isIn(v2)):  # Compare Kravchik evaluation with v
-                    area_points.add_point(x[i, j], 'xleft')                 # if it is inside previous interval, then it's
-                    area_points.add_point(x[i, j + 1], 'xright')             # inside the workspace area
+                    area_points.add_point(x[i, j], 'xleft')  # if it is inside previous interval, then it's
+                    area_points.add_point(x[i, j + 1], 'xright')  # inside the workspace area
                     area_points.add_point(y[i, j], 'yleft')
                     area_points.add_point(y[i + 1, j], 'yright')
                     break
-                if k == e - 1:
-                    border_points.add_point(x[i, j], 'xleft')       # If we achieve max of the iterations, then it's border
+                if k == p - 1:
+                    border_points.add_point(x[i, j], 'xleft')  # If we achieve max of the iterations, then it's border
+                    border_points.add_point(x[i, j + 1], 'xright')
+                    border_points.add_point(y[i, j], 'yleft')
+                    border_points.add_point(y[i + 1, j], 'yright')
+                try:
+                    v1.intersec(v_krav[0][0])  # If our evalution not fully inside, then intersect it and repeat
+                    v2.intersec(v_krav[1][0])
+                except:
+                    break  # if there is no intersection at all, then it's outside of the workspace
+   # print(area_points.get_points('xleft'))
+    return area_points, border_points
+   # classical_area_points, classical_border_points = classical_krav_eval(x, y, n, l1, l2, d, p)
+            #boundary_area_points, boundary_border_points = boundary_krav_eval(u1, u2, l1, l2, d, p)
+    #return classical_area_points, classical_border_points
+
+def classical_krav_eval(x, y, n, l1, l2, d, p=10):
+    area_points = BoxPoints()
+    border_points = BoxPoints()
+    v1 = ival.Interval([l1, l2])  # Interval form of X-coordinate for box v
+    v2 = ival.Interval([l1, l2])  # Interval form of Y-coordinate for box v
+    for i in range(n - 1):
+        for j in range(n - 1):
+            u1 = ival.Interval([x[i, j], x[i, j + 1]])  # Interval form of X-coordinate of rectangle of uniform grid
+            u2 = ival.Interval([y[i, j], y[i + 1, j]])  # Interval form of Y-coordinate of rectangle of uniform grid
+            for k in range(p):
+                v1mid = v1.mid()
+                v2mid = v2.mid()
+                v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d)  # Calculate Kravchik evaluation for u1, u2
+                if (v_krav[0][0].isIn(v1)) and (v_krav[1][0].isIn(v2)):  # Compare Kravchik evaluation with v
+                    area_points.add_point(x[i, j], 'xleft')              # if it is inside previous interval, then it's
+                    area_points.add_point(x[i, j + 1], 'xright')         # inside the workspace area
+                    area_points.add_point(y[i, j], 'yleft')
+                    area_points.add_point(y[i + 1, j], 'yright')
+                    break
+                if k == p - 1:
+                    border_points.add_point(x[i, j], 'xleft')   # If we achieve max of the iterations, then it's border
                     border_points.add_point(x[i, j + 1], 'xright')
                     border_points.add_point(y[i, j], 'yleft')
                     border_points.add_point(y[i + 1, j], 'yright')
@@ -54,37 +81,61 @@ def check_box(x, y, n, l1, l2, d, e = 10):
                     v2.intersec(v_krav[1][0])
                 except:
                     break                 # if there is no intersection at all, then it's outside of the workspace
-   # print(area_points.a)
-   # print(border_points.a)
+    print(area_points.get_points('xleft'))
+    return area_points, border_points
+
+
+def boundary_krav_eval(u1, u2, n, l1, l2, d, p = 10):  # алгоритм с усиленной проверкой по 4 стороным
+    """
+    Function for checking intervals rectangles on uniform grid to compare with
+    :param u1: X-coordinates of elements of uniform grid
+    :param u2: Y-coordinates of elements of uniform grid
+    :param n: number of nodes of uniform grid
+    :param l1: the lowest range of 2-RPR rod
+    :param l2: the highest range of 2-RPR rod
+    :param d: the distance between rods
+    :param p: the max number of iterations
+    :return: 4 arrays of calculated rectangles: X-coordinates of workspace area, Y-coordinates of workspace area,
+             X-coordinates of border of workspace area, Y-coordinates of border of workspace area
+    """
+    check = True
+    v1_border = [ival.Interval([l1, l2]), ival.Interval([l2, l2]), ival.Interval([l1, l2]), ival.Interval([l1, l1])]
+    v2_border = [ival.Interval([l1, l1]), ival.Interval([l1, l2]), ival.Interval([l2, l2]), ival.Interval([l1, l2])]
+    area_points = BoxPoints()
+    border_points = BoxPoints()
+    for p in range(4):
+        v1 = v1_border[p]
+        v2 = v2_border[p]
+        for k in range(10):
+            v1mid = v1.mid()
+            v2mid = v2.mid()
+            v1_bor = ival.Interval([L1, L2])
+            v2_bor = ival.Interval([L1, L2])
+            v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d)
+            if (v_krav[0][0].isIn(v1_bor)) and (v_krav[1][0].isIn(v2_bor)):
+                check = True
+                if p == 3 and check:
+                    area_points.add_point(x[i, j], 'xleft')  # if it is inside previous interval, then it's
+                    area_points.add_point(x[i, j + 1], 'xright')  # inside the workspace area
+                    area_points.add_point(y[i, j], 'yleft')
+                    area_points.add_point(y[i + 1, j], 'yright')
+                    break
+            else:
+                check = False
+            if k == p - 1:
+                border_points.add_point(x[i, j], 'xleft')  # If we achieve max of the iterations, then it's border
+                border_points.add_point(x[i, j + 1], 'xright')
+                border_points.add_point(y[i, j], 'yleft')
+                border_points.add_point(y[i + 1, j], 'yright')
+            try:
+                v1_bor.intersec(A[0][0])
+                v2_bor.intersec(A[1][0])
+                v1 = v1_bor
+                v2 = v2_bor
+            except:
+                break
     return area_points, border_points
 """
-def check_Box_no_Kr(u1, u2):# алгоритм с усиленной проверкой по 4 стороным
-  check = True
-  V1_bor = [ival.Interval([L1, L2]), ival.Interval([L2, L2]), ival.Interval([L1, L2]), ival.Interval([L1, L1])]
-  V2_bor = [ival.Interval([L1, L1]), ival.Interval([L1, L2]), ival.Interval([L2, L2]), ival.Interval([L1, L2])]
-  for p in range(4):
-    v1 = V1_bor[p]
-    v2 = V2_bor[p]
-    for k in range(10):
-          v1mid = v1.mid()
-          v2mid = v2.mid()
-          v1_bor = ival.Interval([L1, L2])
-          v2_bor = ival.Interval([L1, L2])
-          A = Gright_lamb(u1, u2, v1, v2, v1mid, v2mid)
-          if (A[0][0].isIn(v1_bor)) and (A[1][0].isIn(v2_bor)):
-            check = True
-            if p ==3 and check == True:
-              return 0
-            break
-          else:
-            check = False
-          try:
-            v1_bor.intersec(A[0][0])
-            v2_bor.intersec(A[1][0])
-            v1 = v1_bor
-            v2 = v2_bor
-          except:
-            break
 def check_Box_branch_and_bounce(L1x, L2x, L1y, L2y):# алгоритм рекурсивного деления исходной области на более мелкие области
   Lx = L2x - L1x
   Ly = L2y - L1y
