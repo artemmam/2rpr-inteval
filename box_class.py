@@ -1,5 +1,3 @@
-
-
 class BoxPoints(object):
     """docstring"""
     def __init__(self):
