@@ -4,10 +4,10 @@ import interval as ival
 from check_box import check_box
 from plot_workspace_area import plot_workspace
 from box_class import BoxPoints
-from kravchik_operator import get_krav_func
+from kravchik_operator import get_krav_func, get_rec_func
 
 krav_transform = get_krav_func()
-
+rec_func = get_rec_func()
 
 def classical_krav_eval(u1, u2, l1, l2, d, p=10):
     """
@@ -75,9 +75,15 @@ def boundary_krav_check(u1, u2, v1, v2, l1, l2, d):  # алгоритм с ус�
         v_krav = krav_transform(u1, u2, v1_border[s], v2_border[s], v1mid, v2mid, d) # Calculate Kravchik evaluation for u1, u2
         print("v1 = ", v1_border[s])
         print("v2 = ", v2_border[s])
+        print("u1 = ", u1)
+        print("u2 = ", u2)
+        print("v1mid = ", v1mid)
+        print("v2mid", v2mid)
         print("v_krav = ", v_krav)
         # print("v1_bor = ", v1_bor)
         # print("v2_bor = ", v2_bor)
+
+        print("rec = ", rec_func(u1, u2, v1_border[s], v2_border[s], v1mid, v2mid, d))
 
         if not ((v_krav[0][0].isIn(v1_border[s])) and (v_krav[1][0].isIn(v2_border[s]))): # Compare Kravchik evaluation with v
             check = False
@@ -88,9 +94,11 @@ def boundary_krav_check(u1, u2, v1, v2, l1, l2, d):  # алгоритм с ус�
 d = 6
 L1 = 3  # Lower range of row
 L2 = 15  # Upper range of row
-N = 10  # The number of nodes on uniform grid
-l1 = -L2  # Left and lower border of uniform grid
-l2 = L2  # Right and upper border of uniform grid
+N = 2  # The number of nodes on uniform grid
+# l1 = -L2  # Left and lower border of uniform grid
+# l2 = L2  # Right and upper border of uniform grid
+l1 = 1
+l2 = 3
 X1 = np.linspace(l1, l2, N)
 Y1 = np.linspace(l1, l2, N)
 X, Y = np.meshgrid(X1, Y1)  # Build X and Y of uniform grid
