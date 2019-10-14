@@ -31,15 +31,15 @@ def classical_krav_eval(u1, u2, l1, l2, d, p=10):
         v1mid = v1.mid()
         v2mid = v2.mid()
         v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d)  # Calculate Kravchik evaluation for u1, u2
-        print("\nClassic krav:")
-        print("v1 = ", v1)
-        print("v2 = ", v2)
-        print("u1 = ", u1)
-        print("u2 = ", u2)
-        print("v1mid = ", v1mid)
-        print("v2mid", v2mid)
-        print("krav = ", v_krav)
-        print("Boundary krav:")
+        #print("\nClassic krav:")
+        #print("v1 = ", v1)
+        #print("v2 = ", v2)
+        #print("u1 = ", u1)
+        #print("u2 = ", u2)
+        #print("v1mid = ", v1mid)
+        #print("v2mid", v2mid)
+        #print("krav = ", v_krav)
+        #print("Boundary krav:")
         if (v_krav[0][0].isIn(v1)) and (v_krav[1][0].isIn(v2)):  # Compare Kravchik evaluation with v
             return 'inside'  # if it is inside previous interval, then it's inside the workspace area
         elif boundary_krav_check(u1, u2, v1, v2, d):
@@ -80,14 +80,14 @@ def exact_eval(u1, u2, l1, l2, d, p=10):
     v2mid = v2.mid()
     for k in range(p):
         v_exact = rec_func(u1, u2, v1, v2, v1mid, v2mid, d) # Calculate exact_inclusion for u1, u2
-        print("\nExact inclusion, k = ", k, ":")
-        print("v1 = ", v1)
-        print("v2 = ", v2)
-        print("u1 = ", u1)
-        print("u2 = ", u2)
-        print("v1mid = ", v1mid)
-        print("v2mid = ", v2mid)
-        print("exact  = ", v_exact)
+        #print("\nExact inclusion, k = ", k, ":")
+        #print("v1 = ", v1)
+        #print("v2 = ", v2)
+        #print("u1 = ", u1)
+        #print("u2 = ", u2)
+        #print("v1mid = ", v1mid)
+        #print("v2mid = ", v2mid)
+        #print("exact  = ", v_exact)
         if (v_exact[0][0].isIn(v1)) and (v_exact[1][0].isIn(v2)):  # Compare Kravchik evaluation with v
             return 'inside'  # if it is inside previous interval, then it's inside the workspace area
         if k == p - 1:
@@ -125,19 +125,19 @@ def boundary_krav_check(u1, u2, v1, v2, d):  # алгоритм с усилен�
         v1mid = v1_border[s].mid()
         v2mid = v2_border[s].mid()
         v_krav = krav_transform(u1, u2, v1_border[s], v2_border[s], v1mid, v2mid, d) # Calculate Kravchik evaluation for u1, u2
-        print("v1 = ", v1_border[s])
-        print("v2 = ", v2_border[s])
-        print("u1 = ", u1)
-        print("u2 = ", u2)
-        print("v1mid = ", v1mid)
-        print("v2mid", v2mid)
-        print("v_krav = ", v_krav)
+        #print("v1 = ", v1_border[s])
+        #print("v2 = ", v2_border[s])
+        #print("u1 = ", u1)
+        #print("u2 = ", u2)
+        #print("v1mid = ", v1mid)
+        #print("v2mid", v2mid)
+        #print("v_krav = ", v_krav)
         # print("v1_bor = ", v1_bor)
         # print("v2_bor = ", v2_bor)
 
-        print("rec = ", rec_func(u1, u2, v1_border[s], v2_border[s], v1mid, v2mid, d))
-        print("recall", rec_func(u1, u2, v1, v2, v1.mid(), v2.mid(), d))
-        print("kravall", krav_transform(u1, u2, v1, v2, v1.mid(), v2.mid(), d))
+        #print("rec = ", rec_func(u1, u2, v1_border[s], v2_border[s], v1mid, v2mid, d))
+        #print("recall", rec_func(u1, u2, v1, v2, v1.mid(), v2.mid(), d))
+        #print("kravall", krav_transform(u1, u2, v1, v2, v1.mid(), v2.mid(), d))
         if not ((v_krav[0][0].isIn(v1_border[s])) and (v_krav[1][0].isIn(v2_border[s]))): # Compare Kravchik evaluation with v
             check = False
             break
@@ -155,11 +155,11 @@ l2 = L2  # Right and upper border of uniform grid
 X1 = np.linspace(l1, l2, N)
 Y1 = np.linspace(l1, l2, N)
 X, Y = np.meshgrid(X1, Y1)  # Build X and Y of uniform grid
-k = 3  # Max number of iterations
+k = 10  # Max number of iterations
 area_points = BoxPoints()
 border_points = BoxPoints()
 area_points, border_points = check_box(X, Y, N, L1, L2, d, exact_eval, k)  # Calculate workspace area and border coordinates
-# area_points, border_points = check_box(X, Y, N, L1, L2, d, classical_krav_eval, k)  # Calculate workspace area and border coordinates
+area_points_def, border_points_def = check_box(X, Y, N, L1, L2, d, classical_krav_eval, k)  # Calculate workspace area and border coordinates
 # area_points_bound, border_points_bound = check_box(X, Y, N, L1, L2, d, boundary_krav_eval, k)  # Calculate workspace area and border coordinates
 plot_workspace(L1, L2, d, area_points, border_points)  # Plotting
-# plot_workspace(L1, L2, d, area_points_bound, border_points_bound)
+plot_workspace(L1, L2, d, area_points_def, border_points_def)

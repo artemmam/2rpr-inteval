@@ -49,12 +49,12 @@ def get_rec_func():
     lam = f_v**(-1)
     lam = lam.subs([(v1, v1mid), (v2, v2mid)])  # Calculate lambda function for recurrent transformation
     g = v - lam * f  # Equivalent recurrent transformation
-    print("g = ", g)
-    return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g)
+    print("g_easy_comp = ", g)
+   # return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g)
 
 def zzf(x,m):
     print("zzf: ", x, m)
-    zf = lambda x,m : x * (1 - x / (2 * m))
+    zf = lambda x, m : x * (1 - x / (2 * m))
     if m <= x[0]:
         iv = ival.Interval([zf(x[1],m), zf(x[0],m)])
     elif m >= x[1]:
@@ -75,6 +75,6 @@ def get_rec_func_optim():
                                 lambda x, m: zzf(x,m)  )
                                 #ival.Interval(), ival.Interval([x[0] * x[1] / (x[0] + x[1]), (x[0] + x[1])/4]))
     # f = sym.Matrix([[v1*(1 - v1/(2*v1mid)) - (u1**2 + u2**2)/(2*v1mid)], [v2 - (-u2**2 + v2**2 - (-d + u1)**2)/(2*v2mid)]])  # System of kinematic equations
-    f = sym.Matrix([[hump(v1, v1mid) - (u1**2 + u2**2)/(2*v1mid)], [hump(v2, v2mid) - (u2**2 + (u1 - d)**2)/(2*v2mid)]])  # System of kinematic equations
+    f = sym.Matrix([[hump(v1, v1mid) - (-u1**2 - u2**2)/(2*v1mid)], [hump(v2, v2mid) - (-u2**2 - (u1 - d)**2)/(2*v2mid)]])  # System of kinematic equations
     print("g = ", f)
     return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], f)
