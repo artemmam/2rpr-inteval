@@ -23,6 +23,7 @@ def check_box(x, y, n, l1, l2, d, checker, p=10):
         for j in range(n - 1):
             u1 = ival.Interval([x[i, j], x[i, j + 1]])  # Interval form of X-coordinate of rectangle of uniform grid
             u2 = ival.Interval([y[i, j], y[i + 1, j]])  # Interval form of Y-coordinate of rectangle of uniform grid
+
             if checker(u1, u2, l1, l2, d, p) == 'inside': #or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'inside':
                 area_points.add_point(u1[0], 'xleft')
                 area_points.add_point(u1[1], 'xright')         # inside the workspace area
