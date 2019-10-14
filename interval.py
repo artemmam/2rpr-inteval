@@ -145,6 +145,7 @@ def log(x, base):
         return Interval([math.log(x[1], base), math.log(x[0], base)])
 
 
+
 if (__name__ == '__main__'):
     x = Interval([-1, 2])
     print(x)
