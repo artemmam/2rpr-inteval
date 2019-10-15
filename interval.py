@@ -1,5 +1,6 @@
 import math
 
+
 class Interval:
 
     def __init__(self, x):
@@ -11,17 +12,21 @@ class Interval:
     def mid(self):
         return 0.5 * (self.x[0] + self.x[1])
 
+
     def scale(self, factor):
         m = 0.5 * (self.x[0] + self.x[1])
         r = 0.5 * (self.x[1] - self.x[0])
         self.x[0] = m - factor * r
         self.x[1] = m + factor * r
 
+
     def isIn(self, other):
         return (self.x[0] >= other.x[0]) and (self.x[1] <= other.x[1])
 
+
     def isNoIntersec(self, other):
         return (self.x[0] > other.x[1]) or (self.x[1] < other.x[0])
+
 
     def intersec(self, other):
         self.x[0] = max(self.x[0], other.x[0])
@@ -86,16 +91,17 @@ class Interval:
         v = [self.x[0] * ointerval.x[0], self.x[0] * ointerval.x[1], self.x[1] * ointerval.x[0], self.x[1] * ointerval.x[1]]
         b = [min(v), max(v)]
         return Interval(b)
+
+
     def __truediv__(self, other):
         ointerval = valueToInterval(other)
         v = [self.x[0] / ointerval.x[0], self.x[0] / ointerval.x[1], self.x[1] / ointerval.x[0], self.x[1] / ointerval.x[1]]
         b = [min(v), max(v)]
-        return Interval(b)	
-    #def __truediv__(self, other):
-    #    return print("div")
+        return Interval(b)
 
     def __rmul__(self, other):
         return self.__mul__(other)
+
 
 def valueToInterval(expr):
     if isinstance(expr, int):
@@ -105,6 +111,7 @@ def valueToInterval(expr):
     else:
         etmp = expr
     return etmp
+
 
 def sin(x):
     y = [math.sin(x[0]), math.sin(x[1])]
@@ -121,6 +128,7 @@ def sin(x):
         a = min(y)
     return Interval([a,b])
 
+
 def cos(x):
     y = [math.cos(x[0]), math.cos(x[1])]
     pi2 = 2 * math.pi
@@ -135,53 +143,13 @@ def cos(x):
         a = min(y)
     return Interval([a,b])
 
+
 def exp(x):
     return Interval([math.exp(x[0]), math.exp(x[1])])
+
 
 def log(x, base):
     if base > 1:
         return Interval([math.log(x[0], base), math.log(x[1], base)])
     else:
         return Interval([math.log(x[1], base), math.log(x[0], base)])
-
-
-
-if (__name__ == '__main__'):
-    x = Interval([-1, 2])
-    print(x)
-    print(-x)
-    print(x**2)
-    print(x**3)
-    y = Interval([5,6])
-    print(x + y)
-    print(x * y)
-    print(y + 5)
-    print(5 + y)
-    print(y - 1)
-    print(1 - y)
-    print(y * 2.)
-    print(2. * y)
-    print(x.mid(), " ", y.mid())
-    z = Interval([-2,1])
-    x.intersec(z)
-    print(x)
-    try:
-        y.intersec(z)
-    except:
-        print("empty interval")
-    print(cos(Interval([0, math.pi / 2])))
-    print(cos(Interval([- math.pi / 2, math.pi / 2])))
-    print(cos(Interval([- 3 * math.pi / 2, - math.pi / 2])))
-
-    l1 = Interval([4, 4])
-    l2 = Interval([3, 3])
-
-    def f(x, a1, a2):
-        return x - l1 * cos(a1) - l2 * cos(a1 + a2)
-
-    Ix = Interval([0,1])
-    Ia1 = Interval([0, 0.25 * math.pi])
-    Ia2 = Interval([0, 0.5 * math.pi])
-
-    Ir = f(Ix, Ia1, Ia2)
-    print("Ir = ", Ir)
