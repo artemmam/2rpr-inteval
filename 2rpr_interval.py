@@ -27,10 +27,12 @@ def classical_krav_eval(u1, u2, l1, l2, d, p=10):
     v2_init = ival.Interval([l1, l2])  # Interval form of Y-coordinate for box v
     v1 = ival.Interval([l1, l2])  # Interval form of X-coordinate for box v
     v2 = ival.Interval([l1, l2])  # Interval form of Y-coordinate for box v
+    v1mid = v1.mid()
+    v2mid = v2.mid()
     for k in range(p):
-        v1mid = v1.mid()
-        v2mid = v2.mid()
-        v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, d)  # Calculate Kravchik evaluation for u1, u2
+        c1 = v1.mid()
+        c2 = v2.mid()
+        v_krav = krav_transform(u1, u2, v1, v2, v1mid, v2mid, c1, c2, d)  # Calculate Kravchik evaluation for u1, u2
         #if u1[0] == -4.090909090909092 and u1[1] == -1.363636363636365 and u2[0] == 6.818181818181817 and u2[1] == 9.545454545454543:
             #print("\nClassic krav:", k)
             #print("v1 = ", v1)
@@ -43,8 +45,8 @@ def classical_krav_eval(u1, u2, l1, l2, d, p=10):
         #print("Boundary krav:")
         if (v_krav[0][0].isIn(v1)) and (v_krav[1][0].isIn(v2)):  # Compare Kravchik evaluation with v
             return 'inside'  # if it is inside previous interval, then it's inside the workspace area
-        elif boundary_krav_check(u1, u2, v1, v2, d):
-            print("Ura!")
+        # elif boundary_krav_check(u1, u2, v1, v2, d):
+        #     print("Ura!")
             return 'inside'
         if k == p - 1:
             return 'border'  # if we achieve max of the iterations, then it's border
@@ -74,13 +76,11 @@ def exact_eval(u1, u2, l1, l2, d, p=10):
     :param p: the max number of iterations
     :return: the string 'inside', 'outside' or 'border'
     """
-    v1_init = ival.Interval([l1, l2])  # Interval form of X-coordinate for box v
-    v2_init = ival.Interval([l1, l2])  # Interval form of Y-coordinate for box v
     v1 = ival.Interval([l1, l2])  # Interval form of X-coordinate for box v
     v2 = ival.Interval([l1, l2])  # Interval form of Y-coordinate for box v
+    v1mid = .9 * v1.mid()
+    v2mid = 1.4 * v2.mid()
     for k in range(p):
-        v1mid = v1.mid()
-        v2mid = v2.mid()
         v_exact = rec_func(u1, u2, v1, v2, v1mid, v2mid, d) # Calculate exact_inclusion for u1, u2
         #print("\nExact inclusion, k = ", k, ":")
         #print("v1 = ", v1)
@@ -190,7 +190,7 @@ def exact_krav_eval(u1, u2, l1, l2, d, p=10):
 d = 6
 L1 = 3  # Lower range of row
 L2 = 15  # Upper range of row
-N = 12  # The number of nodes on uniform grid
+N = 10  # The number of nodes on uniform grid
 l1 = -L2  # Left and lower border of uniform grid
 l2 = L2  # Right and upper border of uniform grid
 X1 = np.linspace(l1, l2, N)

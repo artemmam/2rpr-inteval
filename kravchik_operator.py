@@ -31,11 +31,12 @@ def get_krav_func():
     g = v - lam * f  # Equivalent recurrent transformation
     g_v = derive_matrix(g)  # Calculate matrix of partial derivatives of matrix g
 
-    c = sym.Matrix([[v1mid], [v2mid]]) # Vector of v-middles
+    c1, c2 = sym.symbols('c1, c2')
+    c = sym.Matrix([[c1], [c2]]) # Vector of v-middles
     v_c = v - c
-    g_eval = g.subs([(v1, v1mid), (v2, v2mid)]) + g_v * v_c  # Calculates classical Kravchik evaluation
+    g_eval = g.subs([(v1, c1), (v2, c2)]) + g_v * v_c  # Calculates classical Kravchik evaluation
     print(g_eval)
-    return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g_eval)
+    return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, c1, c2, d], g_eval)
 
 def get_rec_func():
     """
@@ -63,7 +64,8 @@ def zzf(x, m):
         iv = ival.Interval([zf(x[0],m), zf(x[1],m)])
         #print('2 случай')
     else:
-        iv = ival.Interval([min(zf(x[0],m), zf(x[1],m)), max(zf(x[0],m), zf(x[1],m))])#zf(m,m)])
+        # iv = ival.Interval([min(zf(x[0],m), zf(x[1],m)), max(zf(x[0],m), zf(x[1],m))])#zf(m,m)])
+        iv = ival.Interval([min(zf(x[0],m), zf(x[1],m)), zf(m,m)])
     #print("iv = ", iv)
     return iv
 
