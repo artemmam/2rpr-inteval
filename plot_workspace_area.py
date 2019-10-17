@@ -2,7 +2,6 @@ import shapely.geometry as sg
 import matplotlib.pyplot as plt
 import descartes
 from matplotlib.patches import Circle, Rectangle
-from box_class import BoxPoints
 
 def plot_workspace(l1, l2, d, area_points, border_points):
     """
