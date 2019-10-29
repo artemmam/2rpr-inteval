@@ -34,7 +34,7 @@ def get_krav_func():
     c = sym.Matrix([[c1], [c2]]) # Vector of v-middles
     v_c = v - c
     g_eval = g.subs([(v1, c1), (v2, c2)]) + g_v * v_c  # Calculates classical Kravchik evaluation
-    print(g_eval)
+    #print(g_eval)
     return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, c1, c2, d], g_eval)
 
 
@@ -65,5 +65,113 @@ def get_rec_func_optim():
     v1mid, v2mid = sym.symbols('v1mid, v2mid')
     hump = implemented_function(sym.Function('hump'), lambda x, m: zzf(x,m))
     f = sym.Matrix([[hump(v1, v1mid) - (-u1**2 - u2**2)/(2*v1mid)], [hump(v2, v2mid) - (-u2**2 - (u1 - d)**2)/(2*v2mid)]])  # System of kinematic equations
-    print("g = ", f)
     return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], f)
+
+
+def krav_interval(u1n, u2n, v1n, v2n, v1midn, v2midn, dn, cn):
+    """
+    Function for calculating classical Kravchik evaluation in interval format for parallel robot 2-RPR with
+    variable c
+    :param u1n: interval u1
+    :param u2n: interval u2
+    :param v1n: interval v1
+    :param v2n: interval v2
+    :param v1midn: v1mid
+    :param v2midn: v2mid
+    :param dn: distance between the points of bases
+    :param cn: vector of mids
+    :return: function of  classical Kravchik evaluation in numerical format
+    """
+    v1mid, v2mid = sym.symbols('v1mid, v2mid')
+    f = sym.Matrix(
+        [[v1 ** 2 - u1 ** 2 - u2 ** 2], [v2 ** 2 - (u1 - d) ** 2 - u2 ** 2]])  # System of kinematic equations
+    f_v = derive_matrix(f)  # Calculate matrix of partial derivatives of kinematic matrix
+    v = sym.Matrix([[v1], [v2]])  # Vector v
+    lam = f_v ** (-1)
+    lam = lam.subs([(v1, v1mid), (v2, v2mid)])  # Calculate lambda function for recurrent transformation
+    g = v - lam * f  # Equivalent recurrent transformation
+    g_v = derive_matrix(g)  # Calculate matrix of partial derivatives of matrix g
+    c = sym.Matrix([[cn[0]], [cn[1]]])  # Vector of v-middles
+    v_c = v - c
+    g_eval = g.subs([(v1, cn[0]), (v2, cn[1])]) + g_v * v_c  # Calculates classical Kravchik evaluation
+    F_min = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g_eval)
+    new_v = F_min(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)
+    return new_v
+
+
+def krav_rec_func_number(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
+    """
+    Function for calculating recurrent function in interval format
+    :param u1n: interval u1
+    :param u2n: interval u2
+    :param v1n: interval v1
+    :param v2n: interval v2
+    :param v1midn: v1mid
+    :param v2midn: v2mid
+    :param dn: distance between the points of bases
+    :return: Interval vector of recurrent function
+    """
+    v1mid, v2mid = sym.symbols('v1mid, v2mid')
+    f = sym.Matrix(
+        [[v1 ** 2 - u1 ** 2 - u2 ** 2], [v2 ** 2 - (u1 - d) ** 2 - u2 ** 2]])  # System of kinematic equations
+    f_v = derive_matrix(f)  # Calculate matrix of partial derivatives of kinematic matrix
+    v = sym.Matrix([[v1], [v2]])  # Vector v
+    lam = f_v ** (-1)
+    lam = lam.subs([(v1, v1mid), (v2, v2mid)])  # Calculate lambda function for recurrent transformation
+    g = v - lam * f  # Equivalent recurrent transformation
+    F = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g)
+    new_v = F(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)
+    return new_v
+
+
+def calcul_new_c(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
+    """
+    Function for calculation cmin and cmax for bicentered Kravchik
+    :param u1n: interval u1
+    :param u2n: interval u2
+    :param v1n: interval v1
+    :param v2n: interval v2
+    :param v1midn: v1mid
+    :param v2midn: v2mid
+    :param dn: distance between the points of bases
+    :return: vectors cmin and cmax for bicnetered Kravchik
+    """
+    new_v = krav_rec_func_number(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)  #Calculate vector of recurrent transformation
+    vn = [v1n, v2n]
+    c_min = [0, 0]
+    c_max = [0, 0]
+    for i in range(len(c_min)):
+        if new_v[i][0][1]<=0:
+            c_min[i] = vn[i][1]
+        elif new_v[i][0][0]>=0:
+            c_min[i] = vn[i][0]
+        else:
+            c_min[i] = (new_v[i][0][1]*vn[i][0] - new_v[i][0][0]*vn[i][1])/(new_v[i][0][1] - new_v[i][0][0])
+    for i in range(len(c_max)):
+        if new_v[i][0][1]<=0:
+            c_max[i] = vn[i][0]
+        elif new_v[i][0][0]>=0:
+            c_max[i] = vn[i][1]
+        else:
+            c_max[i] = (new_v[i][0][0]*vn[i][0] - new_v[i][0][1]*vn[i][1])/(new_v[i][0][0] - new_v[i][0][1])
+    return c_min, c_max
+
+
+def get_krav_func_bicentered(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
+    """
+    Function for calculating bicentered Kravchik evaluation in interval format for parallel robot 2-RPR
+    :param u1n: interval u1
+    :param u2n: interval u2
+    :param v1n: interval v1
+    :param v2n: interval v2
+    :param v1midn: v1mid
+    :param v2midn: v2mid
+    :param dn: distance between the points of bases
+    :return: Interval vectors for Kravchik evaluation with cmin and cmax
+    """
+    cmin, cmax = calcul_new_c(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)  # Calculate new c
+    v_min = krav_interval(u1n, u2n, v1n, v2n, v1midn, v2midn, dn, cmin)  #Calculate new v1 and v2 with defualt Krav for cmin
+    v_max = krav_interval(u1n, u2n, v1n, v2n, v1midn, v2midn, dn, cmax)  #Calculate new v1 and v2 with defualt Krav for cmax
+    return (v_min, v_max)
+
+
