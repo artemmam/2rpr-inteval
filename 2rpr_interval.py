@@ -91,7 +91,7 @@ def bicentered_krav_eval(u1, u2, l1, l2, d, coef, p=10):
     v2mid = coef * v2.mid()
     for k in range(p):
         v_min, v_max = get_krav_func_bicentered(u1, u2, v1, v2, v1mid, v2mid, d)
-        v_min[0][0].intersec(v_max[0][0])  # Intersec Krav evalutaion for v_min and v_max 
+        v_min[0][0].intersec(v_max[0][0])  # Intersec Krav evalutaion for v_min and v_max
         v_min[1][0].intersec(v_max[1][0])
         if (v_min[0][0].isIn(v1)) and (v_min[1][0].isIn(v2)):  # Compare bicentered Kravchik evaluation with v
             return 'inside'  # if it is inside previous interval, then it's inside the workspace area
@@ -107,14 +107,14 @@ def bicentered_krav_eval(u1, u2, l1, l2, d, coef, p=10):
 d = 6
 L1 = 3  # Lower range of row
 L2 = 15  # Upper range of row
-N = 12  # The number of nodes on uniform grid
+N = 8  # The number of nodes on uniform grid
 l1 = -L2  # Left and lower border of uniform grid
 l2 = L2  # Right and upper border of uniform grid
 X1 = np.linspace(l1, l2, N)
 Y1 = np.linspace(l1, l2, N)
 X, Y = np.meshgrid(X1, Y1)  # Build X and Y of uniform grid
 k = 10  # Max number of iterations
-coef = 1.5
+coef = 1
 area_points = BoxPoints()
 border_points = BoxPoints()
 area_points, border_points = check_box(X, Y, N, L1, L2, d, exact_eval, coef, k)  # Calculate workspace area and border coordinates

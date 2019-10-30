@@ -34,7 +34,6 @@ def get_krav_func():
     c = sym.Matrix([[c1], [c2]]) # Vector of v-middles
     v_c = v - c
     g_eval = g.subs([(v1, c1), (v2, c2)]) + g_v * v_c  # Calculates classical Kravchik evaluation
-    #print(g_eval)
     return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, c1, c2, d], g_eval)
 
 
@@ -42,7 +41,7 @@ def zzf(x, m):
     """
     It was noticed, that after recursion transformation, both functions with v1 and v2 don't have single inclusion,
     so function zzf is used to calculate exact interval enclosure for grouped v1 and v2 which form same functions for which
-    we easily can calculate roots analytically
+    we can easily calculate roots analytically
     :param x: interval v (v1 or v2)
     :param m: the mid of v
     :return: Exact interval enclosure for function zf
@@ -119,9 +118,13 @@ def krav_rec_func_number(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
     lam = f_v ** (-1)
     lam = lam.subs([(v1, v1mid), (v2, v2mid)])  # Calculate lambda function for recurrent transformation
     g = v - lam * f  # Equivalent recurrent transformation
-    F = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g)
+    g_v = derive_matrix(g)
+    F = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g_v)
+    F1 = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g)
     new_v = F(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)
-    return new_v
+    new_v2 = [[new_v[0][0]],
+               [new_v[1, 1]]]
+    return new_v2
 
 
 def calcul_new_c(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
