@@ -4,16 +4,19 @@ import interval as ival
 v1, v2, u1, u2, d = sym.symbols('v1, v2, u1, u2, d')
 
 
-def derive_matrix(g):
+def derive_matrix(g, v):
     """
     Function for calculating partial derivative of matrix G
     :param g : array to be derived
     :return gv: derived matrix
     """
-    g_v1 = sym.diff(g, v1)  # Calculate derivative of G with respect to v1
-    g_v2 = sym.diff(g, v2)  # Calculate derivative of G with respect to v2
-    gv = sym.Matrix([g_v1, g_v2])
-    gv = gv.reshape(2, 2)
+    g_v_all = []
+    for i in range(g.shape[0]):
+        g_v_all.append(sym.diff(g, v[i]))  # Calculate derivative of G with respect to v1
+    gv = sym.Matrix()
+    for i in range(len(g_v_all)):
+        gv = sym.Matrix([gv, g_v_all[i]])
+    gv = gv.reshape(g.shape[0], g.shape[0]).T
     return gv
 
 
@@ -24,12 +27,13 @@ def get_krav_func():
     """
     v1mid, v2mid = sym.symbols('v1mid, v2mid')
     f = sym.Matrix([[v1**2 - u1**2 - u2**2], [v2**2 - (u1 - d)**2 - u2**2]])  # System of kinematic equations
-    f_v = derive_matrix(f)  # Calculate matrix of partial derivatives of kinematic matrix
-    v = sym.Matrix([[v1], [v2]])  # Vector v
+    v = sym.Matrix([[v1], [v2]])# Vector v
+    f_v = derive_matrix(f, v)  # Calculate matrix of partial derivatives of kinematic matrix
+
     lam = f_v**(-1)
     lam = lam.subs([(v1, v1mid), (v2, v2mid)])  # Calculate lambda function for recurrent transformation
     g = v - lam * f  # Equivalent recurrent transformation
-    g_v = derive_matrix(g)  # Calculate matrix of partial derivatives of matrix g
+    g_v = derive_matrix(g, v)  # Calculate matrix of partial derivatives of matrix g
     c1, c2 = sym.symbols('c1, c2')
     c = sym.Matrix([[c1], [c2]]) # Vector of v-middles
     v_c = v - c
@@ -198,9 +202,6 @@ def get_unified_krav_eval(f, U, V, Vmid, C, param = []):
     for i in range(len(V)):
         v = v.row_insert(i, sym.Matrix([V[i]]))
         vmid = vmid.row_insert(i, sym.Matrix([Vmid[i]]))
-    print(f)
-    print(v)
-    print(vmid)
     f_v = derive_matrix(f, v) # Calculate matrix of partial derivatives of kinematic matrix
     lam = f_v ** (-1)
     for i in range(len(v)):
