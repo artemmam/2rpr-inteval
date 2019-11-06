@@ -95,8 +95,53 @@ class Interval:
 
     def __truediv__(self, other):
         ointerval = valueToInterval(other)
-        v = [self.x[0] / ointerval.x[0], self.x[0] / ointerval.x[1], self.x[1] / ointerval.x[0], self.x[1] / ointerval.x[1]]
-        b = [min(v), max(v)]
+        #print('interval div')
+        #print(self)
+        #print(other)
+        if ointerval[0]!=0 and ointerval[1]!=0:
+        #try:
+            #print(self)
+            #print(other)
+            v = [self.x[0] / ointerval.x[0], self.x[0] / ointerval.x[1], self.x[1] / ointerval.x[0], self.x[1] / ointerval.x[1]]
+            b = [min(v), max(v)]
+        #except ZeroDivisionError:
+        else:
+            ointerval = Interval([0.001, 0.001])
+            #print('0')
+            #print(self, other)
+            v = [self.x[0] / ointerval.x[0], self.x[0] / ointerval.x[1], self.x[1] / ointerval.x[0],
+                 self.x[1] / ointerval.x[1]]
+            b = [min(v), max(v)]
+            #return Interval([0, 0])
+        #v = [self.x[0] / ointerval.x[0], self.x[0] / ointerval.x[1], self.x[1] / ointerval.x[0], self.x[1] / ointerval.x[1]]
+        #b = [min(v), max(v)]
+        return Interval(b)
+
+    def __floordiv__(self, other):
+        ointerval = valueToInterval(other)
+        # print('interval div')
+        # print(self)
+        # print(other)
+        if ointerval[0] != 0 and ointerval[1] != 0:
+            # try:
+            # print(self)
+            # print(other)
+            v = [self.x[0] // ointerval.x[0], self.x[0] // ointerval.x[1], self.x[1] // ointerval.x[0],
+                 self.x[1] // ointerval.x[1]]
+            print(v)
+            b = [min(v), max(v)]
+        # except ZeroDivisionError:
+        else:
+            ointerval = Interval([0.001, 0.001])
+            # print('0')
+            # print(self, other)
+            v = [self.x[0] // ointerval.x[0], self.x[0] // ointerval.x[1], self.x[1] // ointerval.x[0],
+                 self.x[1] // ointerval.x[1]]
+            print(v)
+            b = [min(v), max(v)]
+            # return Interval([0, 0])
+        # v = [self.x[0] / ointerval.x[0], self.x[0] / ointerval.x[1], self.x[1] / ointerval.x[0], self.x[1] / ointerval.x[1]]
+        # b = [min(v), max(v)]
         return Interval(b)
 
     def __rmul__(self, other):
@@ -114,6 +159,9 @@ def valueToInterval(expr):
 
 
 def sin(x):
+    x = valueToInterval(x)
+    #if x is not Interval:
+    #    x = valueToInterval(x)
     y = [math.sin(x[0]), math.sin(x[1])]
     pi2 = 2 * math.pi
     pi05 = math.pi / 2
@@ -130,13 +178,13 @@ def sin(x):
 
 
 def cos(x):
+    x = valueToInterval(x)
     y = [math.cos(x[0]), math.cos(x[1])]
     pi2 = 2 * math.pi
     if math.ceil(x[0]/pi2) <= math.floor(x[1]/pi2):
         b = 1
     else:
         b = max(y)
-
     if math.ceil((x[0] - math.pi)/pi2) <= math.floor((x[1] - math.pi)/pi2):
         a = -1
     else:

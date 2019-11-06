@@ -161,12 +161,15 @@ def set_param(L2, N):
 
 """
 f, U, V, Vmid, C, param_sym = func_2rpr()
-L1 = 3  # Lower range of row
-L2 = 15  # Upper range of row
+L1v = 3  # Lower range of row
+L2v = 15  # Upper range of row
+L1u = L1v
+L2u = L2v
 d = 6
 N = 12  # The number of nodes on uniform grid
-X, Y = set_param(L2, N)
+X, Y = set_param(L2u, N)
 param = [d]
+unified_krav_func = get_unified_krav_eval(f, U, V, Vmid, C, param_sym)
 """
 d = 6
 
@@ -175,15 +178,16 @@ f, U, V, Vmid, C = func_sin_cos()
 L1u = -1  # Lower range of box U
 L2u = 1  # Upper range of box U
 
-L1v = 0  # Lower range of box U
-L2v = np.pi/2  # Upper range of box U
+L1v = 0  # Lower range of box V
+L2v = np.pi/2  # Upper range of box V
 #
 N = 12  # The number of nodes on uniform grid
 X, Y = set_param(L2u, N)
 param = []
-
-
 unified_krav_func = get_unified_krav_eval(f, U, V, Vmid, C)
+
+
+
 k = 10  # Max number of iterations
 coef = 1
 area_points = BoxPoints()
