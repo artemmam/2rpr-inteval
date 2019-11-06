@@ -1,7 +1,7 @@
 import numpy as np
 import interval as ival
 from check_box import check_box, check_box_uni
-from plot_workspace_area import plot_workspace
+from plot_workspace_area import plot_workspace, uni_plotter
 from box_class import BoxPoints
 from kravchik_operator import get_krav_func, get_rec_func_optim, get_krav_func_bicentered, get_unified_krav_eval
 import sympy as sym
@@ -159,26 +159,40 @@ def set_param(L2, N):
     X, Y = np.meshgrid(X1, Y1)  # Build X and Y of uniform grid
     return (X, Y)
 
-
+"""
 f, U, V, Vmid, C, param_sym = func_2rpr()
-
-unified_krav_func = get_unified_krav_eval(f, U, V, Vmid, C, param_sym)
-
-k = 10  # Max number of iterations
-coef = 1
 L1 = 3  # Lower range of row
 L2 = 15  # Upper range of row
 d = 6
 N = 12  # The number of nodes on uniform grid
 X, Y = set_param(L2, N)
 param = [d]
+"""
+d = 6
 
+
+f, U, V, Vmid, C = func_sin_cos()
+L1u = -1  # Lower range of box U
+L2u = 1  # Upper range of box U
+
+L1v = 0  # Lower range of box U
+L2v = np.pi/2  # Upper range of box U
+#
+N = 12  # The number of nodes on uniform grid
+X, Y = set_param(L2u, N)
+param = []
+
+
+unified_krav_func = get_unified_krav_eval(f, U, V, Vmid, C)
+k = 10  # Max number of iterations
+coef = 1
 area_points = BoxPoints()
 border_points = BoxPoints()
 #area_points, border_points = check_box(X, Y, N, L1, L2, d, exact_eval, coef, k)  # Calculate workspace area and border coordinates
-area_points_def, border_points_def = check_box(X, Y, N, L1, L2, d, classical_krav_eval, coef, k)  # Calculate workspace area and border coordinates
-area_points_uni, border_points_uni = check_box_uni(X, Y, N, L1, L2, param, unified_krav_eval, coef, k)  # Calculate workspace area and border coordinates
+#area_points_def, border_points_def = check_box(X, Y, N, L1, L2, d, classical_krav_eval, coef, k)  # Calculate workspace area and border coordinates
+area_points_uni, border_points_uni = check_box_uni(X, Y, N, L1v, L2v, param, unified_krav_eval, coef, k)  # Calculate workspace area and border coordinates
 #area_points_bic, border_points_bic = check_box(X, Y, N, L1, L2, d, bicentered_krav_eval, coef, k)
 #plot_workspace(L1, L2, d, area_points, border_points)  # Plotting
 #plot_workspace(L1, L2, d, area_points_bic, border_points_bic)
-plot_workspace(L1, L2, d, area_points_def, border_points_def)
+#plot_workspace(L1, L2, d, area_points_def, border_points_def)
+uni_plotter(area_points_uni, border_points_uni, L1u, L2u)

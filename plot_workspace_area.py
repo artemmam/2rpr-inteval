@@ -59,3 +59,30 @@ def plot_workspace(l1, l2, d, area_points, border_points):
         plt.show()
     else:
         print('Wrong data')
+
+
+def uni_plotter(area_points, border_points, L1, L2):
+    left_border = -L2  # Left border of rectangle which we use to build uniform grid
+    right_border = L2
+    fig, ax = plt.subplots(figsize=(8, 8))
+    x_min, y_min, x_max, y_max = left_border - 1, left_border - 1, right_border + 1, right_border + 1
+    ax.set_xlim([x_min, x_max])
+    ax.set_ylim([y_min, y_max])
+    rect1 = Rectangle([left_border, left_border], 2*right_border, 2*right_border, fill=False, color='g',
+                      linewidth=2.0)
+    ax.add_patch(rect1)
+    ax.axes.set_aspect('equal')
+    for i in range(len(area_points.get_points('xleft'))):  # Plot rectangles, which compose workspace area
+        rect1 = Rectangle([area_points.get_points('xleft')[i], area_points.get_points('yleft')[i]],
+                          area_points.get_points('xright')[i] - area_points.get_points('xleft')[i],
+                          area_points.get_points('yright')[i] - area_points.get_points('yleft')[i],
+                          fill=True, fc='red', color='g', linewidth=1.0, alpha=0.5)
+        ax.add_patch(rect1)
+    for i in range(
+            len(border_points.get_points('xleft'))):  # Plot rectangles, which compose the border of workspace area
+        rect2 = Rectangle([border_points.get_points('xleft')[i], border_points.get_points('yleft')[i]],
+                          border_points.get_points('xright')[i] - border_points.get_points('xleft')[i],
+                          border_points.get_points('yright')[i] - border_points.get_points('yleft')[i],
+                          fill=True, fc='black', color='yellow', linewidth=1.0, alpha=0.5)
+        ax.add_patch(rect2)
+    plt.show()
