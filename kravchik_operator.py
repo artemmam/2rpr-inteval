@@ -178,3 +178,44 @@ def get_krav_func_bicentered(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
     return (v_min, v_max)
 
 
+def mysin(x):
+    return ival.sin(x)
+
+
+def mycos(x):
+    return ival.cos(x)
+
+
+def get_unified_krav_eval(f, U, V, Vmid, C, param = []):
+    mysin1 = implemented_function(sym.Function('mysin1'), lambda x: mysin(x))
+    mycos1 = implemented_function(sym.Function('mycos1'), lambda x: mycos(x))
+    """
+    Function for calculating classical Kravchik evaluation in symbol format for parallel robot 2-RPR
+    :return: function of classical Kravchik evaluation in numerical format
+    """
+    v = sym.Matrix()
+    vmid = sym.Matrix()
+    for i in range(len(V)):
+        v = v.row_insert(i, sym.Matrix([V[i]]))
+        vmid = vmid.row_insert(i, sym.Matrix([Vmid[i]]))
+    print(f)
+    print(v)
+    print(vmid)
+    f_v = derive_matrix(f, v) # Calculate matrix of partial derivatives of kinematic matrix
+    lam = f_v ** (-1)
+    for i in range(len(v)):
+        lam = lam.subs([(V[i], Vmid[i])]) # Calculate lambda function for recurrent transformation
+    g = v - lam * f # Equivalent recurrent transformation
+    g_v = derive_matrix(g, v) # Calculate matrix of partial derivatives of matrix g
+    c = sym.Matrix()
+    for i in range(len(v)):
+        c = c.row_insert(i, sym.Matrix([C[i]]))
+    v_c = v - c
+    for i in range(len(V)):
+        g = g.subs([(V[i], C[i])])
+    g_eval = g + g_v * v_c # Calculates classical Kravchik evaluation
+    g_eval = g_eval.replace(sym.sin, mysin1)
+    g_eval = g_eval.replace(sym.cos, mycos1)
+    return sym.lambdify([U, V, Vmid, C, param], g_eval)
+
+
