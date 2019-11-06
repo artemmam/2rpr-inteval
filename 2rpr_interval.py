@@ -1,6 +1,6 @@
 import numpy as np
 import interval as ival
-from check_box import check_box
+from check_box import check_box, check_box_uni
 from plot_workspace_area import plot_workspace
 from box_class import BoxPoints
 from kravchik_operator import get_krav_func, get_rec_func_optim, get_krav_func_bicentered, get_unified_krav_eval
