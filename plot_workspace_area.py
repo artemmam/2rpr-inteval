@@ -61,7 +61,7 @@ def plot_workspace(l1, l2, d, area_points, border_points):
         print('Wrong data')
 
 
-def uni_plotter(area_points, border_points, L1, L2):
+def uni_plotter(area_points, border_points, L2):
     left_border = -L2  # Left border of rectangle which we use to build uniform grid
     right_border = L2
     fig, ax = plt.subplots(figsize=(8, 8))

@@ -22,14 +22,13 @@ def derive_matrix(g, v):
 
 def get_krav_func():
     """
-    Function for calculating classical Kravchik evaluation in symbol format for parallel robot 2-RPR
-    :return: function of  classical Kravchik evaluation in numerical format
+    Function for calculating classical Krawczyk evaluation in symbol format for parallel robot 2-RPR
+    :return: function of  classical Krawczyk evaluation in numerical format
     """
     v1mid, v2mid = sym.symbols('v1mid, v2mid')
     f = sym.Matrix([[v1**2 - u1**2 - u2**2], [v2**2 - (u1 - d)**2 - u2**2]])  # System of kinematic equations
     v = sym.Matrix([[v1], [v2]])# Vector v
     f_v = derive_matrix(f, v)  # Calculate matrix of partial derivatives of kinematic matrix
-
     lam = f_v**(-1)
     lam = lam.subs([(v1, v1mid), (v2, v2mid)])  # Calculate lambda function for recurrent transformation
     g = v - lam * f  # Equivalent recurrent transformation
@@ -37,7 +36,7 @@ def get_krav_func():
     c1, c2 = sym.symbols('c1, c2')
     c = sym.Matrix([[c1], [c2]]) # Vector of v-middles
     v_c = v - c
-    g_eval = g.subs([(v1, c1), (v2, c2)]) + g_v * v_c  # Calculates classical Kravchik evaluation
+    g_eval = g.subs([(v1, c1), (v2, c2)]) + g_v * v_c  # Calculates classical Krawczyk evaluation
     return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, c1, c2, d], g_eval)
 
 
@@ -67,13 +66,14 @@ def get_rec_func_optim():
     """
     v1mid, v2mid = sym.symbols('v1mid, v2mid')
     hump = implemented_function(sym.Function('hump'), lambda x, m: zzf(x,m))
-    f = sym.Matrix([[hump(v1, v1mid) - (-u1**2 - u2**2)/(2*v1mid)], [hump(v2, v2mid) - (-u2**2 - (u1 - d)**2)/(2*v2mid)]])  # System of kinematic equations
+    f = sym.Matrix([[hump(v1, v1mid) - (-u1**2 - u2**2)/(2*v1mid)],
+                    [hump(v2, v2mid) - (-u2**2 - (u1 - d)**2)/(2*v2mid)]])  # System of kinematic equations
     return sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], f)
 
 
 def krav_interval(u1n, u2n, v1n, v2n, v1midn, v2midn, dn, cn):
     """
-    Function for calculating classical Kravchik evaluation in interval format for parallel robot 2-RPR with
+    Function for calculating classical Krawczyk evaluation in interval format for parallel robot 2-RPR with
     variable c
     :param u1n: interval u1
     :param u2n: interval u2
@@ -83,11 +83,11 @@ def krav_interval(u1n, u2n, v1n, v2n, v1midn, v2midn, dn, cn):
     :param v2midn: v2mid
     :param dn: distance between the points of bases
     :param cn: vector of mids
-    :return: function of  classical Kravchik evaluation in numerical format
+    :return: function of  classical Krawczyk evaluation in numerical format
     """
     v1mid, v2mid = sym.symbols('v1mid, v2mid')
-    f = sym.Matrix(
-        [[v1 ** 2 - u1 ** 2 - u2 ** 2], [v2 ** 2 - (u1 - d) ** 2 - u2 ** 2]])  # System of kinematic equations
+    f = sym.Matrix([[v1 ** 2 - u1 ** 2 - u2 ** 2],
+                    [v2 ** 2 - (u1 - d) ** 2 - u2 ** 2]])  # System of kinematic equations
     f_v = derive_matrix(f)  # Calculate matrix of partial derivatives of kinematic matrix
     v = sym.Matrix([[v1], [v2]])  # Vector v
     lam = f_v ** (-1)
@@ -96,7 +96,7 @@ def krav_interval(u1n, u2n, v1n, v2n, v1midn, v2midn, dn, cn):
     g_v = derive_matrix(g)  # Calculate matrix of partial derivatives of matrix g
     c = sym.Matrix([[cn[0]], [cn[1]]])  # Vector of v-middles
     v_c = v - c
-    g_eval = g.subs([(v1, cn[0]), (v2, cn[1])]) + g_v * v_c  # Calculates classical Kravchik evaluation
+    g_eval = g.subs([(v1, cn[0]), (v2, cn[1])]) + g_v * v_c  # Calculates classical Krawczyk evaluation
     F_min = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g_eval)
     new_v = F_min(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)
     return new_v
@@ -133,7 +133,7 @@ def krav_rec_func_number(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
 
 def calcul_new_c(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
     """
-    Function for calculation cmin and cmax for bicentered Kravchik
+    Function for calculation cmin and cmax for bicentered Krawczyk
     :param u1n: interval u1
     :param u2n: interval u2
     :param v1n: interval v1
@@ -141,9 +141,9 @@ def calcul_new_c(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
     :param v1midn: v1mid
     :param v2midn: v2mid
     :param dn: distance between the points of bases
-    :return: vectors cmin and cmax for bicnetered Kravchik
+    :return: vectors cmin and cmax for bicnetered Krawczyk
     """
-    new_v = krav_rec_func_number(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)  #Calculate vector of recurrent transformation
+    new_v = krav_rec_func_number(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)
     vn = [v1n, v2n]
     c_min = [0, 0]
     c_max = [0, 0]
@@ -166,7 +166,7 @@ def calcul_new_c(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
 
 def get_krav_func_bicentered(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
     """
-    Function for calculating bicentered Kravchik evaluation in interval format for parallel robot 2-RPR
+    Function for calculating bicentered Krawczyk evaluation in interval format for parallel robot 2-RPR
     :param u1n: interval u1
     :param u2n: interval u2
     :param v1n: interval v1
@@ -174,7 +174,7 @@ def get_krav_func_bicentered(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
     :param v1midn: v1mid
     :param v2midn: v2mid
     :param dn: distance between the points of bases
-    :return: Interval vectors for Kravchik evaluation with cmin and cmax
+    :return: Interval vectors for Krawczyk evaluation with cmin and cmax
     """
     cmin, cmax = calcul_new_c(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)  # Calculate new c
     v_min = krav_interval(u1n, u2n, v1n, v2n, v1midn, v2midn, dn, cmin)  #Calculate new v1 and v2 with defualt Krav for cmin
@@ -183,20 +183,36 @@ def get_krav_func_bicentered(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
 
 
 def mysin(x):
+    """
+    Interval sin
+    :param x: interval
+    :return: interval sin(x)
+    """
     return ival.sin(x)
 
 
 def mycos(x):
+    """
+    Interval cos
+    :param x: interval
+    :return: interval cos(x)
+    """
     return ival.cos(x)
 
 
 def get_unified_krav_eval(f, U, V, Vmid, C, param = []):
+    """
+    :param f: system of equations
+    :param U: output parameters
+    :param V: input parameters
+    :param Vmid: mids of V
+    :param C: new mids of C
+    :param param: list of const parameters
+    :return: function for calculating Krawczyk evaluation
+    """
     mysin1 = implemented_function(sym.Function('mysin1'), lambda x: mysin(x))
     mycos1 = implemented_function(sym.Function('mycos1'), lambda x: mycos(x))
-    """
-    Function for calculating classical Kravchik evaluation in symbol format for parallel robot 2-RPR
-    :return: function of classical Kravchik evaluation in numerical format
-    """
+    print(f, U, V, Vmid, C, param)
     v = sym.Matrix()
     vmid = sym.Matrix()
     for i in range(len(V)):
@@ -214,9 +230,7 @@ def get_unified_krav_eval(f, U, V, Vmid, C, param = []):
     v_c = v - c
     for i in range(len(V)):
         g = g.subs([(V[i], C[i])])
-    g_eval = g + g_v * v_c # Calculates classical Kravchik evaluation
+    g_eval = g + g_v * v_c # Calculates classical Krawczyk evaluation
     g_eval = g_eval.replace(sym.sin, mysin1)
     g_eval = g_eval.replace(sym.cos, mycos1)
     return sym.lambdify([U, V, Vmid, C, param], g_eval)
-
-

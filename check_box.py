@@ -37,7 +37,7 @@ def check_box(x, y, n, l1, l2, d, checker, coef, p=10):
     return area_points, border_points
 
 
-def check_box_uni(x, y, n, l1, l2, param, checker, coef, p=10):
+def check_box_uni(x, y, n, V, param, checker, coef, p=10):
     """
     Function for checking intervals rectangles on uniform grid to approximate workspace area of 2-RPR robot
     :param x: X-coordinates of elements of uniform grid
@@ -57,12 +57,12 @@ def check_box_uni(x, y, n, l1, l2, param, checker, coef, p=10):
             u1 = ival.Interval([x[i, j], x[i, j + 1]])  # Interval form of X-coordinate of rectangle of uniform grid
             u2 = ival.Interval([y[i, j], y[i + 1, j]])  # Interval form of Y-coordinate of rectangle of uniform grid
             U = [u1, u2]
-            if checker(U, l1, l2, param, coef, p) == 'inside': #or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'inside':
+            if checker(U, V, param, p) == 'inside': #or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'inside':
                 area_points.add_point(u1[0], 'xleft')
                 area_points.add_point(u1[1], 'xright')         # inside the workspace area
                 area_points.add_point(u2[0], 'yleft')
                 area_points.add_point(u2[1], 'yright')
-            elif checker(U, l1, l2, param, coef, p) == 'border': #or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'border':
+            elif checker(U, V, param, p) == 'border': #or boundary_krav_eval(u1, u2, n, l1, l2, d, p) == 'border':
                 border_points.add_point(u1[0], 'xleft')  # if it is inside previous interval, then it's
                 border_points.add_point(u1[1], 'xright')  # inside the workspace area
                 border_points.add_point(u2[0], 'yleft')
