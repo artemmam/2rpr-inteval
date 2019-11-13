@@ -222,6 +222,7 @@ def get_unified_krav_eval(f, U, V, Vmid, C, param = []):
     lam = f_v ** (-1)
     for i in range(len(v)):
         lam = lam.subs([(V[i], Vmid[i])]) # Calculate lambda function for recurrent transformation
+    lam = 0.2 * sym.eye(f.shape[0])
     g = v - lam * f # Equivalent recurrent transformation
     g_v = derive_matrix(g, v) # Calculate matrix of partial derivatives of matrix g
     c = sym.Matrix()

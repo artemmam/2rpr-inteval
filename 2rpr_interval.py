@@ -162,6 +162,20 @@ def func_2rpr():
          [V[1] ** 2 - (U[0] - param_sym[0]) ** 2 - U[1] ** 2]])
     return f, U, V, Vmid, C, param_sym
 
+
+def func_dextar():
+    Vmid = sym.symbols('v1mid, v2mid, v3mid, v4mid')
+    V = sym.symbols('v1, v2, v3, v4')
+    U = sym.symbols('u1, u2')
+    C = sym.symbols('c1, c2, c3, c4')
+    param_sym = sym.symbols('la, lb, lc, ld, d')
+    f = sym.Matrix([[U[0] - param_sym[1] * sym.cos(V[2]) - param_sym[0] * sym.cos(V[0]) - param_sym[4] / 2],
+                    [U[0] + param_sym[4] / 2 - param_sym[3] * sym.cos(V[1]) - param_sym[2] * sym.cos(V[3])],
+                    [U[1] - param_sym[0] * sym.sin(V[0]) - param_sym[1] * sym.sin(V[2])],
+                    [U[1] - param_sym[3] * sym.sin(V[1]) - param_sym[2] * sym.sin(V[3])]])
+    return f, U, V, Vmid, C, param_sym
+
+
 ### Setting params
 def set_param(L2, N):
     l1 = -L2  # Left and lower border of uniform grid
@@ -172,6 +186,8 @@ def set_param(L2, N):
     return (X, Y)
 
 N = 25  # The number of nodes on uniform grid
+
+
 
 """
 ##### 2-RPR
@@ -188,7 +204,7 @@ param = [d]
 unified_krav_func = get_unified_krav_eval(f, U, V, Vmid, C, param_sym)
 #####
 """
-#"""
+"""
 ##### sin-cos func
 f, U, V, Vmid, C = func_sin_cos()
 L1u = -1  # Lower range of box U
@@ -202,7 +218,7 @@ X, Y = set_param(L2u, N)
 param = []
 unified_krav_func = get_unified_krav_eval(f, U, V, Vmid, C)
 #####
-#"""
+"""
 """
 ##### robot func
 f, U, V, Vmid, C = func_robot()
@@ -216,6 +232,28 @@ param = []
 unified_krav_func = get_unified_krav_eval(f, U, V, Vmid, C)
 #####
 """
+#"""
+####  dextar
+f, U, V, Vmid, C, sym_param = func_dextar()
+la = 7.2
+lb = 2.0
+d = 6
+L1u = -(la + lb + d)  # Lower range of box U
+L2u = (la + lb + d)  # Upper range of box U
+#L1v = 0  # Lower range of box V
+#L2v = np.pi/2  # Upper range of box V
+l1 = 0
+l2 = np.pi/2
+v1 = ival.Interval([l1, l2])
+v2 = ival.Interval([l1, l2])
+v3 = ival.Interval([l1, l2])
+v4 = ival.Interval([l1, l2])
+V_ival = [v1, v2, v3, v4]
+X, Y = set_param(L2u, N)
+param = [la, lb, lb, la, d]
+unified_krav_func = get_unified_krav_eval(f, U, V, Vmid, C, sym_param)
+#####
+#"""
 
 
 k = 10  # Max number of iterations
@@ -229,4 +267,5 @@ area_points_uni, border_points_uni = check_box_uni(X, Y, N, V_ival, param, unifi
 #plot_workspace(L1, L2, d, area_points, border_points)  # Plotting
 #plot_workspace(L1, L2, d, area_points_bic, border_points_bic)
 #plot_workspace(L1, L2, d, area_points_def, border_points_def)
-uni_plotter(area_points_uni, border_points_uni, L2u)
+#uni_plotter(area_points_uni, border_points_uni, L2u)
+uni_plotter(area_points_uni, border_points_uni, L2u, la, lb, d)
