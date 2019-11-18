@@ -29,11 +29,11 @@ class Interval:
 
 
     def intersec(self, other):
-        #x[0] = max(self.x[0], other.x[0])
-        #x[1] = min(self.x[1], other.x[1])
+        self[0] = max(self.x[0], other.x[0])
+        self[1] = min(self.x[1], other.x[1])
         if self.x[0] > self.x[1]:
             raise ValueError(other.x[0], other.x[1], "results in wrong bounds:", self.x[0], self.x[1])
-        return Interval([max(self.x[0], other.x[0]), min(self.x[1], other.x[1])])
+        #return Interval([max(self.x[0], other.x[0]), min(self.x[1], other.x[1])])
 
     def __getitem__(self, item):
         return self.x[item]

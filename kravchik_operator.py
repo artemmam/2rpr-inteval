@@ -88,12 +88,12 @@ def krav_interval(u1n, u2n, v1n, v2n, v1midn, v2midn, dn, cn):
     v1mid, v2mid = sym.symbols('v1mid, v2mid')
     f = sym.Matrix([[v1 ** 2 - u1 ** 2 - u2 ** 2],
                     [v2 ** 2 - (u1 - d) ** 2 - u2 ** 2]])  # System of kinematic equations
-    f_v = derive_matrix(f)  # Calculate matrix of partial derivatives of kinematic matrix
     v = sym.Matrix([[v1], [v2]])  # Vector v
+    f_v = derive_matrix(f, v)  # Calculate matrix of partial derivatives of kinematic matrix
     lam = f_v ** (-1)
     lam = lam.subs([(v1, v1mid), (v2, v2mid)])  # Calculate lambda function for recurrent transformation
     g = v - lam * f  # Equivalent recurrent transformation
-    g_v = derive_matrix(g)  # Calculate matrix of partial derivatives of matrix g
+    g_v = derive_matrix(g, v)  # Calculate matrix of partial derivatives of matrix g
     c = sym.Matrix([[cn[0]], [cn[1]]])  # Vector of v-middles
     v_c = v - c
     g_eval = g.subs([(v1, cn[0]), (v2, cn[1])]) + g_v * v_c  # Calculates classical Krawczyk evaluation
@@ -117,14 +117,14 @@ def krav_rec_func_number(u1n, u2n, v1n, v2n, v1midn, v2midn, dn):
     v1mid, v2mid = sym.symbols('v1mid, v2mid')
     f = sym.Matrix(
         [[v1 ** 2 - u1 ** 2 - u2 ** 2], [v2 ** 2 - (u1 - d) ** 2 - u2 ** 2]])  # System of kinematic equations
-    f_v = derive_matrix(f)  # Calculate matrix of partial derivatives of kinematic matrix
     v = sym.Matrix([[v1], [v2]])  # Vector v
+    f_v = derive_matrix(f, v)  # Calculate matrix of partial derivatives of kinematic matrix
     lam = f_v ** (-1)
     lam = lam.subs([(v1, v1mid), (v2, v2mid)])  # Calculate lambda function for recurrent transformation
     g = v - lam * f  # Equivalent recurrent transformation
-    g_v = derive_matrix(g)
+    g_v = derive_matrix(g, v)
     F = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g_v)
-    F1 = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g)
+    #F1 = sym.lambdify([u1, u2, v1, v2, v1mid, v2mid, d], g)
     new_v = F(u1n, u2n, v1n, v2n, v1midn, v2midn, dn)
     new_v2 = [[new_v[0][0]],
                [new_v[1, 1]]]
@@ -212,18 +212,19 @@ def get_unified_krav_eval(f, U, V, Vmid, C, param = []):
     """
     mysin1 = implemented_function(sym.Function('mysin1'), lambda x: mysin(x))
     mycos1 = implemented_function(sym.Function('mycos1'), lambda x: mycos(x))
-    print(f, U, V, Vmid, C, param)
     v = sym.Matrix()
     vmid = sym.Matrix()
     for i in range(len(V)):
         v = v.row_insert(i, sym.Matrix([V[i]]))
         vmid = vmid.row_insert(i, sym.Matrix([Vmid[i]]))
     f_v = derive_matrix(f, v) # Calculate matrix of partial derivatives of kinematic matrix
-    lam = f_v ** (-1)
+    lam = f_v
     for i in range(len(v)):
         lam = lam.subs([(V[i], Vmid[i])]) # Calculate lambda function for recurrent transformation
-    lam = 0.2 * sym.eye(f.shape[0])
+    lam = lam ** (-1)
+    lam = 1 * sym.eye(f.shape[0])
     g = v - lam * f # Equivalent recurrent transformation
+    """
     g_v = derive_matrix(g, v) # Calculate matrix of partial derivatives of matrix g
     c = sym.Matrix()
     for i in range(len(v)):
@@ -235,3 +236,7 @@ def get_unified_krav_eval(f, U, V, Vmid, C, param = []):
     g_eval = g_eval.replace(sym.sin, mysin1)
     g_eval = g_eval.replace(sym.cos, mycos1)
     return sym.lambdify([U, V, Vmid, C, param], g_eval)
+    """
+    g = g.replace(sym.sin, mysin1)
+    g = g.replace(sym.cos, mycos1)
+    return sym.lambdify([U, V, Vmid, C, param], g)
